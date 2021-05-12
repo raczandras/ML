@@ -159,7 +159,7 @@ plt.show();
 
 
 # Finding optimal cluster number
-Max_K = 31;  # maximum cluster number
+Max_K = 15;  # maximum cluster number
 SSE = np.zeros((Max_K-2));
 DB = np.zeros((Max_K-2));
 for i in range(Max_K-2):
@@ -187,7 +187,7 @@ plt.plot(np.arange(2,Max_K),DB, color='blue')
 plt.show();
 
 #KMEANS with optimal clusters
-kmeans = KMeans(n_clusters=2, random_state=2020);
+kmeans = KMeans(n_clusters=4, random_state=2020);
 kmeans.fit(X_test);
 data_labels = kmeans.labels_;
 cm = contingency_matrix(y_test, kmeans.labels_);
