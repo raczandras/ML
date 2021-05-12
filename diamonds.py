@@ -22,7 +22,8 @@ from sklearn.metrics.cluster import contingency_matrix;
 from sklearn.pipeline import make_pipeline;
 from sklearn.preprocessing import StandardScaler;
 
-#Getting the diamonds
+
+#Getting the dataset
 diamonds = pd.read_csv('https://raw.githubusercontent.com/raczandras/ML/main/diamonds.csv');
 
 atts = diamonds.drop('pricerange',axis=1);
@@ -37,6 +38,10 @@ target_names = ["cheap", "average", "expensive"];
 diamonds2 = diamonds;
 
 columns_titles= ["carat", "price", "x_length", "y_length", "z_length"];
+
+#The relationship of attributes
+sns.pairplot(data=diamonds)
+plt.show()
 
 #PCA
 pipe = make_pipeline(StandardScaler(), PCA());
@@ -124,9 +129,9 @@ plt.title('Confusion matrix for TRAIN data (decision tree)');
 plot_confusion_matrix(class_tree, X_test, y_test, display_labels = target_names);
 plt.title('Confusion matrix for TEST data (decision tree)');
 
-#Contingency
+
 # Finding optimal cluster number
-Max_K = 12;  # maximum cluster number
+Max_K = 31;  # maximum cluster number
 SSE = np.zeros((Max_K-2));
 DB = np.zeros((Max_K-2));
 for i in range(Max_K-2):
@@ -158,5 +163,4 @@ kmeans = KMeans(n_clusters=3, random_state=2020);
 kmeans.fit(X_test);
 data_labels = kmeans.labels_;
 cm = contingency_matrix(y_test, kmeans.labels_);
-
 
