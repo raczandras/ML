@@ -187,7 +187,7 @@ plt.plot(np.arange(2,Max_K),DB, color='blue')
 plt.show();
 
 #KMEANS with optimal clusters
-kmeans = KMeans(n_clusters=3, random_state=2020);
+kmeans = KMeans(n_clusters=2, random_state=2020);
 kmeans.fit(X_test);
 data_labels = kmeans.labels_;
 cm = contingency_matrix(y_test, kmeans.labels_);
