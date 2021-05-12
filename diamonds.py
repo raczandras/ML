@@ -17,27 +17,23 @@ from sklearn.decomposition import PCA;  # importing PCA
 import seaborn as sns;  # importing the Seaborn library
 import matplotlib.colors as col;  # importing coloring tools from MatPlotLib
 from sklearn.cluster import KMeans; # Class for K-means clustering
-from sklearn.metrics import davies_bouldin_score;  # function for Davies-Bouldin goodness-of-fit 
+from sklearn.metrics import davies_bouldin_score, roc_curve, auc;  # function for Davies-Bouldin goodness-of-fit 
 from sklearn.metrics.cluster import contingency_matrix;
 from sklearn.pipeline import make_pipeline;
 from sklearn.preprocessing import StandardScaler;
 
-
 #Getting the dataset
 diamonds = pd.read_csv('https://raw.githubusercontent.com/raczandras/ML/main/diamonds.csv');
-
-atts = diamonds.drop('pricerange',axis=1);
+atts = diamonds.drop('expensive',axis=1);
 atts2 = atts.to_numpy();
 att_names = atts.columns;
-target = diamonds['pricerange'];
+target = diamonds['expensive'];
 target2 = target.copy();
-target = target.replace(to_replace = 1, value = "cheap");
-target = target.replace(to_replace = 2, value = "average");
-target = target.replace(to_replace = 3, value = "expensive");
-target_names = ["cheap", "average", "expensive"];
+target = target.replace(to_replace = 0, value = "not expensive");
+target = target.replace(to_replace = 1, value = "expensive");
+target_names = ["not expensive", "expensive"];
 diamonds2 = diamonds;
-
-columns_titles= ["carat", "price", "x_length", "y_length", "z_length"];
+columns_titles= ["carat", "depth", "table", "expensive", "x", "y", "z"];
 
 #The relationship of attributes
 sns.pairplot(data=diamonds)
@@ -66,7 +62,7 @@ plt.show();
 
 
 #Scatter for attributes
-colors = ['blue','red','green'];
+colors = ['blue','red'];
 plt.figure();
 p = atts.shape[1]; # number of attributes
 feature_selection = SelectKBest(k=2);
@@ -88,7 +84,7 @@ plt.scatter(atts2[:,0],atts2[:,1],s=50,c=target2, cmap=col.ListedColormap(colors
 plt.show();
 
 #Divide data to test and train data
-X_train, X_test, y_train, y_test = train_test_split(atts, target, test_size=0.2, 
+X_train, X_test, y_train, y_test = train_test_split(atts, target2, test_size=0.2, 
                                 shuffle = True, random_state=2021);
 
 # Fitting logistic regression
@@ -104,12 +100,28 @@ yprobab_logreg = logreg_classifier.predict_proba(X_test)
 scores = cross_val_score(logreg_classifier, atts, target, cv=5)
 print("Logistic regression scores:")
 print(scores)
+
 #Results of logistic regression
 plot_confusion_matrix(logreg_classifier, X_train, y_train, display_labels = target_names);
 plt.title('Confusion matrix for TRAIN data (logreg)');
 plot_confusion_matrix(logreg_classifier, X_test, y_test, display_labels = target_names);
 plt.title('Confusion matrix for TEST data (logreg)');
 
+# Plotting ROC curve
+fpr_logreg, tpr_logreg, _ = roc_curve(y_test, yprobab_logreg[:,1]);
+roc_auc_logreg = auc(fpr_logreg, tpr_logreg);
+plt.figure(7);
+lw = 2;
+plt.plot(fpr_logreg, tpr_logreg, color='red',
+         lw=lw, label='Logistic regression (AUC = %0.2f)' % roc_auc_logreg);
+plt.plot([0, 1], [0, 1], color='black', lw=lw, linestyle='--');
+plt.xlim([-0.01, 1.0]);
+plt.ylim([-0.01, 1.05]);
+plt.xlabel('False Positive Rate');
+plt.ylabel('True Positive Rate');
+plt.title('Receiver operating characteristic curve (logreg)');
+plt.legend(loc="lower right");
+plt.show();
 
 #Fitting decision tree
 depth = 3;
@@ -128,6 +140,22 @@ plot_confusion_matrix(class_tree, X_train, y_train, display_labels = target_name
 plt.title('Confusion matrix for TRAIN data (decision tree)');
 plot_confusion_matrix(class_tree, X_test, y_test, display_labels = target_names);
 plt.title('Confusion matrix for TEST data (decision tree)');
+
+# Plotting ROC curve
+fpr_logreg, tpr_logreg, _ = roc_curve(y_test, yprobab_tree[:,1]);
+roc_auc_logreg = auc(fpr_logreg, tpr_logreg);
+plt.figure(7);
+lw = 2;
+plt.plot(fpr_logreg, tpr_logreg, color='red',
+         lw=lw, label='Logistic regression (AUC = %0.2f)' % roc_auc_logreg);
+plt.plot([0, 1], [0, 1], color='black', lw=lw, linestyle='--');
+plt.xlim([-0.01, 1.0]);
+plt.ylim([-0.01, 1.05]);
+plt.xlabel('False Positive Rate');
+plt.ylabel('True Positive Rate');
+plt.title('Receiver operating characteristic curve (decision tree');
+plt.legend(loc="lower right");
+plt.show();
 
 
 # Finding optimal cluster number
