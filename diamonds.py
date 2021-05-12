@@ -21,3 +21,6 @@ from sklearn.metrics import davies_bouldin_score;  # function for Davies-Bouldin
 from sklearn.metrics.cluster import contingency_matrix;
 from sklearn.pipeline import make_pipeline;
 from sklearn.preprocessing import StandardScaler;
+
+#Getting the diamonds
+diamonds = pd.read_csv('https://raw.githubusercontent.com/raczandras/ML/main/diamonds.csv');
